@@ -1,0 +1,139 @@
+{
+  "meta": {
+    "instanceId": "smartrecruit-ai"
+  },
+  "workflows": [
+    {
+      "id": "1",
+      "name": "SmartRecruit — CV Reçu",
+      "active": true,
+      "description": "Déclenché quand un CV est reçu. Envoie une confirmation au candidat et alerte le recruteur.",
+      "nodes": [
+        {
+          "id": "webhook-cv-received",
+          "name": "Webhook CV Reçu",
+          "type": "n8n-nodes-base.webhook",
+          "typeVersion": 1,
+          "position": [200, 300],
+          "parameters": {
+            "path": "cv_received",
+            "responseMode": "onReceived",
+            "responseData": "firstEntryJson"
+          }
+        },
+        {
+          "id": "send-confirmation-email",
+          "name": "Email Confirmation Candidat",
+          "type": "n8n-nodes-base.emailSend",
+          "typeVersion": 2,
+          "position": [500, 300],
+          "parameters": {
+            "toEmail": "={{ $json.candidate_email }}",
+            "subject": "CV reçu — SmartRecruit AI",
+            "message": "Bonjour,\n\nVotre CV a bien été reçu et est en cours d'analyse par notre IA.\n\nVous recevrez une notification dès que l'analyse sera terminée.\n\nL'équipe SmartRecruit AI"
+          }
+        }
+      ],
+      "connections": {
+        "webhook-cv-received": {
+          "main": [[{ "node": "send-confirmation-email", "type": "main", "index": 0 }]]
+        }
+      }
+    },
+    {
+      "id": "2",
+      "name": "SmartRecruit — Candidature Reçue",
+      "active": true,
+      "description": "Déclenché à chaque nouvelle candidature. Notifie le candidat et le recruteur.",
+      "nodes": [
+        {
+          "id": "webhook-application",
+          "name": "Webhook Nouvelle Candidature",
+          "type": "n8n-nodes-base.webhook",
+          "typeVersion": 1,
+          "position": [200, 300],
+          "parameters": {
+            "path": "application_received",
+            "responseMode": "onReceived"
+          }
+        },
+        {
+          "id": "email-candidat",
+          "name": "Email Candidat",
+          "type": "n8n-nodes-base.emailSend",
+          "typeVersion": 2,
+          "position": [500, 200],
+          "parameters": {
+            "toEmail": "={{ $json.candidate_email }}",
+            "subject": "Candidature reçue — {{ $json.job_title }}",
+            "message": "Bonjour {{ $json.candidate_name }},\n\nVotre candidature pour le poste « {{ $json.job_title }} » a bien été enregistrée.\n\nNotre IA analyse votre profil et calcule votre score de compatibilité.\n\nSmartRecruit AI"
+          }
+        },
+        {
+          "id": "email-recruteur",
+          "name": "Email Recruteur",
+          "type": "n8n-nodes-base.emailSend",
+          "typeVersion": 2,
+          "position": [500, 400],
+          "parameters": {
+            "toEmail": "={{ $json.recruiter_email }}",
+            "subject": "Nouvelle candidature — {{ $json.job_title }}",
+            "message": "Nouvelle candidature reçue de {{ $json.candidate_name }} pour le poste « {{ $json.job_title }} ».\n\nConsultez votre tableau de bord pour voir le classement des candidats.\n\nSmartRecruit AI"
+          }
+        }
+      ],
+      "connections": {
+        "webhook-application": {
+          "main": [
+            [
+              { "node": "email-candidat", "type": "main", "index": 0 },
+              { "node": "email-recruteur", "type": "main", "index": 0 }
+            ]
+          ]
+        }
+      }
+    },
+    {
+      "id": "3",
+      "name": "SmartRecruit — Clôture Automatique des Offres",
+      "active": true,
+      "description": "Tâche planifiée (cron) : appelle l'API Django toutes les heures pour clôturer les offres expirées.",
+      "nodes": [
+        {
+          "id": "cron-auto-close",
+          "name": "Cron Hourly",
+          "type": "n8n-nodes-base.cron",
+          "typeVersion": 1,
+          "position": [200, 300],
+          "parameters": {
+            "triggerTimes": {
+              "item": [{ "mode": "everyX", "value": 1, "unit": "hours" }]
+            }
+          }
+        },
+        {
+          "id": "http-auto-close",
+          "name": "Appel API Close Offers",
+          "type": "n8n-nodes-base.httpRequest",
+          "typeVersion": 3,
+          "position": [500, 300],
+          "parameters": {
+            "method": "POST",
+            "url": "http://backend:8000/api/v1/jobs/auto-close/",
+            "sendHeaders": true,
+            "headerParameters": {
+              "parameters": [
+                { "name": "Authorization", "value": "Bearer {{ $env.BACKEND_API_TOKEN }}" }
+              ]
+            }
+          }
+        }
+      ],
+      "connections": {
+        "cron-auto-close": {
+          "main": [[{ "node": "http-auto-close", "type": "main", "index": 0 }]]
+        }
+      }
+    }
+  ]
+}
