@@ -1,0 +1,31 @@
+# ── Django & REST Framework ──────────────────────────────────────────────────
+Django==5.2.15
+djangorestframework==3.17.1
+djangorestframework-simplejwt==5.5.1
+django-cors-headers==4.9.0
+django-environ==0.14.0
+django-filter==26.2
+drf-yasg==1.21.18
+whitenoise==6.12.0
+
+# ── Base de données ──────────────────────────────────────────────────────────
+psycopg2-binary==2.9.12
+
+# ── Celery & Redis ───────────────────────────────────────────────────────────
+celery==5.6.3
+redis==8.1.0
+django-celery-results==2.6.0
+django-celery-beat==2.9.0
+
+# ── IA / NLP ─────────────────────────────────────────────────────────────────
+PyMuPDF==1.28.2
+scikit-learn==1.9.1
+# sentence-transformers==2.7.0   # décommentez pour activer Sentence-BERT
+# spacy==3.7.6                    # décommentez puis: python -m spacy download fr_core_news_md
+
+# ── Serveur production ────────────────────────────────────────────────────────
+gunicorn==23.0.0
+
+# ── Utilitaires ─────────────────────────────────────────────────────────────
+requests==2.32.3
+Pillow==10.4.0

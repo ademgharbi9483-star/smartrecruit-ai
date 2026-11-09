@@ -1,0 +1,11 @@
+# Dépendances de développement et de test uniquement
+# Usage : pip install -r requirements.txt -r requirements-dev.txt
+-r requirements.txt
+
+pytest==9.0.3
+pytest-django==4.12.0
+pytest-cov==6.0.0
+pytest-env==1.1.5
+pytest-xdist==3.6.1
+pytest-html==4.2.0
+factory-boy==3.3.3
