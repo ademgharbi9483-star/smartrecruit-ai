@@ -1,0 +1,61 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.egg-info/
+dist/
+build/
+.eggs/
+*.egg
+
+# Environnements virtuels
+.venv/
+venv/
+env/
+ENV/
+
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+static/
+
+# Variables d'environnement (JAMAIS commiter le .env réel)
+.env
+!.env.example
+
+# Docker
+*.override.yml
+
+# Tests / Coverage
+.coverage
+htmlcov/
+.pytest_cache/
+.tox/
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Node / React (frontend)
+node_modules/
+frontend/build/
+frontend/.env
+frontend/.env.local
+
+# Ajouts avant publication
+*.sqlite3
+coverage.xml
+.coverage.*
+.env.local
+*.pem
+*.key
+frontend/dist/
